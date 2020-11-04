@@ -181,8 +181,7 @@ Whether to take the max (over history) of denominator, same as AMSGrad. It's set
 ##### 5. Details to reproduce results
 * Results in the paper are generated using the PyTorch implementation in ```adabelief-pytorch``` package. This is the __ONLY__ package that I have extensively tested for now. <br>
 * We also provide a modification of ```ranger``` optimizer in ```ranger-adabelief``` which combines ```RAdam + LookAhead + Gradient Centralization + AdaBelief```, but this is not used in the paper and is not extensively tested. 
-* <del> The ```adabelief-tf==0.0.1``` is a naive implementation in Tensorflow. It lacks many features such as ```decoupled weight decay```, and is not extensively tested. Currently I don't have plans to improve it since I seldom use Tensorflow, please contact me if you want to collaborate and improve it.
-</del>
+* <del> The ```adabelief-tf==0.0.1``` is a naive implementation in Tensorflow. It lacks many features such as ```decoupled weight decay```, and is not extensively tested. Currently I don't have plans to improve it since I seldom use Tensorflow, please contact me if you want to collaborate and improve it.</del>
 * The ```adabelief-tf==0.1.0``` supports the same feature as ```adabelief-pytorch==0.1.0```, including ```decoupled weight decay``` and rectification. But personally I don't have the chance to perform extensive tests as with the PyTorch version.
 
 ##### 6. Learning rate schedule
