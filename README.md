@@ -158,7 +158,7 @@ Please instal the latest version from pip, old versions might suffer from bugs. 
 #### Discussion on algorithms
 ##### 1. Weight Decay: 
 - Decoupling (argument ```weight_decouple ``` appears in ```AdaBelief``` and ```RangerAdaBelief```): <br>
-   Currently there are two ways to perform weight decay for adaptive optimizers, directly apply it to the gradient (Adam), or ```decouple``` weight decay from gradient descent (AdamW). This is passed to the optimizer by argument ```weight_decouple (default: False)```.
+   Currently there are two ways to perform weight decay for adaptive optimizers, directly apply it to the gradient (Adam), or ```decouple``` weight decay from gradient descent (AdamW). This is passed to the optimizer by argument ```weight_decouple (default: True)```.
 
 - Fixed ratio (argument ```fixed_decay (default: False)``` appears in ```AdaBelief```): <br>
    (1) If ```weight_decouple == False```, then this argument does not affect optimization. <br>
@@ -170,10 +170,10 @@ Please instal the latest version from pip, old versions might suffer from bugs. 
    This is seldom discussed in the literature, but personally I think it's very important. When we set ```weight_decay=1e-4``` for SGD, the weight is scaled by ```1 - lr x weight_decay```. Two points need to be emphasized: (1) ```lr``` in SGD is typically larger than Adam (0.1 vs 0.001), so the weight decay in Adam needs to be set as a larger number to compensate. (2) ```lr``` decays, this means typically we use a larger weight decay in early phases, and use a small weight decay in late phases.
 
 ##### 2. Epsilon:
-AdaBelief seems to require a different ```epsilon``` from Adam. In CV tasks in this paper, ```epsilon``` is set as ```1e-8```. For GAN training and LSTM, it's set as ```1e-12```. We recommend try different ```epsilon``` values in practice, and sweep through a large region, e.g. ```1e-8, 1e-10, 1e-12, 1e-14, 1e-16, 1e-18```. Typically a smaller ```epsilon``` makes it more adaptive.
+AdaBelief seems to require a different ```epsilon``` from Adam. In image classification tasks in this paper, ```epsilon``` is set as ```1e-8```. For GAN training and LSTM, it's set as ```1e-16```. We recommend try different ```epsilon``` values in practice, and sweep through a large region, e.g. ```1e-8, 1e-12, 1e-16```. Typically a smaller ```epsilon``` makes it more adaptive.
 
 ##### 3. Rectify (argument ```rectify``` in ```AdaBelief```):
-Whether to turn on the rectification as in RAdam. The recitification basically uses SGD in early phases for warmup, then switch to Adam. Rectification is implemented as an option, but is never used to produce results in the paper.
+Whether to turn on the rectification as in RAdam. The recitification basically uses SGD in early phases for warmup, then switch to Adam. Rectification is implemented as an option, and is not used to produce results in the paper version 1, only used for extra experiments with SN-GAN and Transformers.
 
 ##### 4. AMSgrad (argument ```amsgrad (default: False)``` in ```AdaBelief```):
 Whether to take the max (over history) of denominator, same as AMSGrad. It's set as False for all experiments.
@@ -181,7 +181,9 @@ Whether to take the max (over history) of denominator, same as AMSGrad. It's set
 ##### 5. Details to reproduce results
 * Results in the paper are generated using the PyTorch implementation in ```adabelief-pytorch``` package. This is the __ONLY__ package that I have extensively tested for now. <br>
 * We also provide a modification of ```ranger``` optimizer in ```ranger-adabelief``` which combines ```RAdam + LookAhead + Gradient Centralization + AdaBelief```, but this is not used in the paper and is not extensively tested. 
-* The ```adabelief-tf``` is a naive implementation in Tensorflow. It lacks many features such as ```decoupled weight decay```, and is not extensively tested. Currently I don't have plans to improve it since I seldom use Tensorflow, please contact me if you want to collaborate and improve it.
+* <del> The ```adabelief-tf==0.0.1``` is a naive implementation in Tensorflow. It lacks many features such as ```decoupled weight decay```, and is not extensively tested. Currently I don't have plans to improve it since I seldom use Tensorflow, please contact me if you want to collaborate and improve it.
+</del>
+* The ```adabelief-tf==0.1.0``` supports the same feature as ```adabelief-pytorch==0.1.0```, including ```decoupled weight decay``` and rectification. But personally I don't have the chance to perform extensive tests as with the PyTorch version.
 
 ##### 6. Learning rate schedule
 The experiments on Cifar is the same as demo in AdaBound, with the only difference is the optimizer. The ImageNet experiment uses a different learning rate schedule, typically is decayed by 1/10 at epoch 30, 60, and ends at 90. For some reasons I have not extensively experimented, AdaBelief performs good when decayed at epoch 70, 80 and ends at 90, using the default lr schedule produces a slightly worse result. If you have any ideas on this please open an issue here or email me.
